@@ -1,7 +1,5 @@
-#include <iostream>
 #include "matrix.hpp"
 
-using namespace std;
 
 /*konstruktor dla macierzy*/
 
@@ -9,19 +7,9 @@ Matrix::Matrix(int n, int m){
     row = n;
     columns = m;
     cout<<"Tworzenie macierzy "<<row<<"x"<<columns<<endl;
-
-    // alokowanie tablicy dwuwymiarowej
-    matrix = new double * [row]; 
-
+    matrix.resize(row); // tworzymy odpowiedni liczbe wierszy w wektorze
     for(int i = 0; i < row; i++){
-        matrix[i] = new double[columns];
-    }
-
-    // wypelnienie tablicy zerami
-    for(int i = 0; i < row; i++){
-        for(int j = 0; j < columns; j++){
-            matrix[i][j] = 0;
-        }
+        matrix[i].resize(columns, 0); // w każdym wierszu towrzymy odpowiednią lizbe kolumn i każde miejsce wypełniamy zerami
     }
 }
 
@@ -31,20 +19,34 @@ Matrix::Matrix(int n){
     row = n;
     columns = n;
     cout<<"Tworzenie macierzy "<<row<<"x"<<columns<<endl;
-
-    //alokowanie tablicy dwuwymiarowej
-    matrix = new double * [row]; 
-
+    matrix.resize(row); // tworzymy odpowiedni liczbe wierszy w wektorze
     for(int i = 0; i < row; i++){
-        matrix[i] = new double[columns];
+        matrix[i].resize(columns, 0); // w każdym wierszu towrzymy odpowiednią lizbe kolumn i każde miejsce wypełniamy zerami
     }
+}
 
-    // wypelnienie tablicy zerami
-    for(int i = 0; i < row; i++){
-        for(int j = 0; j < columns; j++){
-            matrix[i][j] = 0;
+/*konstruktor dla macierzy z pliku*/
+
+Matrix::Matrix(string path){
+    ifstream file;
+    file.open(path);
+    if(file.is_open()){
+        file >> row;
+        file >> columns;
+        cout<<"Tworzenie macierzy "<<row<<"x"<<columns<<endl;
+        matrix.resize(row); // tworzymy odpowiedni liczbe wierszy w wektorze
+        for(int i = 0; i < row; i++){
+            matrix[i].resize(columns); // w każdym wierszu towrzymy odpowiednią liczbe kolumn
         }
-    }
+        // wypelnienie tablicy
+        for(int i = 0; i < row; i++){
+            for(int j = 0; j < columns; j++){
+                file >> matrix[i][j];
+            }
+        }   
+        
+        file.close();
+    }else cout<<"Blad. Plik nie zostal otwarty"<<endl;
 }
 
 /*drukowanie macierzy na ekran */
@@ -105,6 +107,7 @@ Matrix Matrix::add(Matrix m2){
             }
         }
         return matrix_sum;
+
     }else exit(1);    
 }
 
@@ -136,3 +139,26 @@ Matrix Matrix::multiply(Matrix m2){
         return matrix_mul;
     }else exit(1);  
 }
+
+/*zapisywanie do pliku*/
+
+ void Matrix::store(string filename, string path){
+     ofstream file;
+     path += "/" + filename;
+     file.open(path);
+     if(file.is_open()){
+         file<<row<<" "<<columns<<endl;
+         for(int i = 0; i < row; i++){
+             for(int j = 0; j < columns; j++){
+                 file<<matrix[i][j]<<" ";
+             }
+             file<<"\n";
+         }
+         file.close();
+     }else cout<<"Blad. Plik nie zostal otwarty"<<endl;
+ }
+
+ /*destruktor*/
+
+ Matrix::~Matrix(){
+ }
